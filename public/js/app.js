@@ -88,6 +88,9 @@ function productCard(p) {
   return `
     <div class="product-card" data-id="${p.id}">
       ${p.featured ? '<span class="featured-badge">TOP</span>' : ''}
+      <div class="pc-image">
+        <img src="${p.image_url || 'https://via.placeholder.com/300x200?texto=Sin+Imagen'}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x200?texto=Sin+Imagen'">
+      </div>
       <div class="pc-cat">${p.category_icon || ''} ${p.category_name || ''}</div>
       <div class="pc-name">${p.name}</div>
       <div class="pc-brand">${p.brand}</div>

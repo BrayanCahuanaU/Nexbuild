@@ -259,6 +259,23 @@ img { display: block; max-width: 100%; }
   gap: 8px;
   position: relative;
 }
+
+.product-card .pc-image {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.product-card .pc-image img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
 .product-card:hover { background: var(--surface2); }
 
 .product-card .pc-cat {
