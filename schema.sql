@@ -53,10 +53,10 @@ CREATE TABLE IF NOT EXISTS builds (
 -- ============================================================
 
 -- CPUs
-INSERT INTO products (category_id, name, brand, price, stock, specs, featured) VALUES
-(1, 'Intel Core i3-12100F', 'Intel', 380.00, 15, '{"cores":4,"threads":8,"base_ghz":3.3,"boost_ghz":4.3,"tdp":58,"socket":"LGA1700","gen":"12va Gen"}', FALSE),
-(1, 'Intel Core i5-12400F', 'Intel', 650.00, 20, '{"cores":6,"threads":12,"base_ghz":2.5,"boost_ghz":4.4,"tdp":65,"socket":"LGA1700","gen":"12va Gen"}', TRUE),
-(1, 'Intel Core i5-13600K', 'Intel', 950.00, 12, '{"cores":14,"threads":20,"base_ghz":3.5,"boost_ghz":5.1,"tdp":125,"socket":"LGA1700","gen":"13va Gen"}', TRUE),
+INSERT INTO products (category_id, name, brand, price, stock, specs, image_url, featured) VALUES
+(1, 'Intel Core i3-12100F', 'Intel', 380.00, 15, '{"cores":4,"threads":8,"base_ghz":3.3,"boost_ghz":4.3,"tdp":58,"socket":"LGA1700","gen":"12va Gen"}', 'https://c1.neweggimages.com/productimage/nb1280/19-118-357-03.jpg', FALSE),
+(1, 'Intel Core i5-12400F', 'Intel', 650.00, 20, '{"cores":6,"threads":12,"base_ghz":2.5,"boost_ghz":4.4,"tdp":65,"socket":"LGA1700","gen":"12va Gen"}', 'https://www.bhphotovideo.com/cdn-cgi/image/fit=scale-down,width=500,quality=95/https://www.bhphotovideo.com/images/images500x500/intel_bx8071512400f_core_i5_12400f_desktop_processor_1641301554_1675542.jpg', TRUE),
+(1, 'Intel Core i5-13600K', 'Intel', 950.00, 12, '{"cores":14,"threads":20,"base_ghz":3.5,"boost_ghz":5.1,"tdp":125,"socket":"LGA1700","gen":"13va Gen"}', 'https://www.bhphotovideo.com/cdn-cgi/image/fit=scale-down,width=500,quality=95/https://www.bhphotovideo.com/images/images500x500/intel_bx8071513600k_core_i5_13600k_3_5_ghz_1664553928_1721752.jpg', TRUE),
 (1, 'Intel Core i7-13700K', 'Intel', 1450.00, 8, '{"cores":16,"threads":24,"base_ghz":3.4,"boost_ghz":5.4,"tdp":125,"socket":"LGA1700","gen":"13va Gen"}', FALSE),
 (1, 'Intel Core i9-13900K', 'Intel', 2200.00, 5, '{"cores":24,"threads":32,"base_ghz":3.0,"boost_ghz":5.8,"tdp":125,"socket":"LGA1700","gen":"13va Gen"}', FALSE),
 (1, 'AMD Ryzen 5 5600',     'AMD',   580.00, 18, '{"cores":6,"threads":12,"base_ghz":3.5,"boost_ghz":4.4,"tdp":65,"socket":"AM4","gen":"Zen 3"}', TRUE),
@@ -72,8 +72,8 @@ INSERT INTO products (category_id, name, brand, price, stock, specs, featured) V
 (1, 'AMD Ryzen 9 7950X3D',  'AMD',   980.00, 6,  '{"cores":16,"threads":32,"base_ghz":4.2,"boost_ghz":5.7,"tdp":120,"socket":"AM5","gen":"Zen 4"}', FALSE);
 
 -- GPUs
-INSERT INTO products (category_id, name, brand, price, stock, specs, featured) VALUES
-(2, 'AMD RX 6600 XT 8GB',         'AMD',    950.00,  12, '{"vram_gb":8,"type":"GDDR6","bus":128,"tdp":160,"connectors":1}', FALSE),
+INSERT INTO products (category_id, name, brand, price, stock, specs, image_url, featured) VALUES
+(2, 'AMD RX 6600 XT 8GB',         'AMD',    950.00,  12, '{"vram_gb":8,"type":"GDDR6","bus":128,"tdp":160,"connectors":1}', 'https://www.bhphotovideo.com/cdn-cgi/image/fit=scale-down,width=500,quality=95/https://www.bhphotovideo.com/images/images500x500/xfx_rx_66xt8lbdq_radeon_rx_6600_xt_1628678125_1657927.jpg', FALSE),
 (2, 'NVIDIA RTX 3060 12GB',       'NVIDIA', 1100.00, 15, '{"vram_gb":12,"type":"GDDR6","bus":192,"tdp":170,"connectors":1}', TRUE),
 (2, 'AMD RX 6700 XT 12GB',        'AMD',    1280.00, 10, '{"vram_gb":12,"type":"GDDR6","bus":192,"tdp":230,"connectors":1}', FALSE),
 (2, 'NVIDIA RTX 3060 Ti 8GB',     'NVIDIA', 1350.00, 10, '{"vram_gb":8,"type":"GDDR6","bus":256,"tdp":200,"connectors":1}', FALSE),
@@ -91,8 +91,8 @@ INSERT INTO products (category_id, name, brand, price, stock, specs, featured) V
 (2, 'AMD RX 7700 XT 12GB',        'AMD',    620.00, 12, '{"vram_gb":12,"type":"GDDR6","bus":192,"tdp":245,"connectors":1}', TRUE);
 
 -- RAM
-INSERT INTO products (category_id, name, brand, price, stock, specs, featured) VALUES
-(3, 'Kingston Fury 8GB DDR4 3200MHz',       'Kingston', 120.00, 30, '{"gb":8,"type":"DDR4","mhz":3200,"modules":1,"cl":16}', FALSE),
+INSERT INTO products (category_id, name, brand, price, stock, specs, image_url, featured) VALUES
+(3, 'Kingston Fury 8GB DDR4 3200MHz',       'Kingston', 120.00, 30, '{"gb":8,"type":"DDR4","mhz":3200,"modules":1,"cl":16}', 'https://media.kingston.com/kingston/product/FURY_Beast_Black_DDR4_1R_1-tn.png', FALSE),
 (3, 'Corsair Vengeance 16GB DDR4 3200MHz',  'Corsair',  220.00, 25, '{"gb":16,"type":"DDR4","mhz":3200,"modules":2,"cl":16}', TRUE),
 (3, 'G.Skill Ripjaws 32GB DDR4 3600MHz',    'G.Skill',  380.00, 15, '{"gb":32,"type":"DDR4","mhz":3600,"modules":2,"cl":18}', TRUE),
 (3, 'Kingston Fury 16GB DDR5 4800MHz',      'Kingston', 320.00, 20, '{"gb":16,"type":"DDR5","mhz":4800,"modules":2,"cl":40}', FALSE),
@@ -110,8 +110,8 @@ INSERT INTO products (category_id, name, brand, price, stock, specs, featured) V
 (3, 'Kingston Fury Renegade 32GB DDR5 6400MHz','Kingston',720.00,8,  '{"gb":32,"type":"DDR5","mhz":6400,"modules":2,"cl":40}', FALSE);
 
 -- Storage
-INSERT INTO products (category_id, name, brand, price, stock, specs, featured) VALUES
-(4, 'Kingston A400 500GB SATA SSD',    'Kingston', 180.00, 25, '{"gb":500,"type":"SSD","interface":"SATA","read_mbs":500,"write_mbs":450}', FALSE),
+INSERT INTO products (category_id, name, brand, price, stock, specs, image_url, featured) VALUES
+(4, 'Kingston A400 500GB SATA SSD',    'Kingston', 180.00, 25, '{"gb":500,"type":"SSD","interface":"SATA","read_mbs":500,"write_mbs":450}', 'https://shop.kingston.com/cdn/shop/products/A400-main_small.jpg?v=1665784648', FALSE),
 (4, 'WD Blue 1TB NVMe PCIe 3.0',      'WD',       280.00, 20, '{"gb":1000,"type":"NVMe","interface":"PCIe 3.0","read_mbs":3500,"write_mbs":3000}', TRUE),
 (4, 'Samsung 980 Pro 1TB NVMe PCIe 4.0','Samsung', 420.00, 15, '{"gb":1000,"type":"NVMe","interface":"PCIe 4.0","read_mbs":7000,"write_mbs":5000}', TRUE),
 (4, 'WD Black 2TB NVMe PCIe 4.0',     'WD',       680.00, 10, '{"gb":2000,"type":"NVMe","interface":"PCIe 4.0","read_mbs":7300,"write_mbs":6600}', FALSE),
@@ -130,8 +130,8 @@ INSERT INTO products (category_id, name, brand, price, stock, specs, featured) V
 (4, 'Samsung Portable SSD T7 1TB',    'Samsung',  180.00, 20, '{"gb":1000,"type":"SSD","interface":"USB-C","read_mbs":1050,"write_mbs":1000}', FALSE);
 
 -- Motherboards
-INSERT INTO products (category_id, name, brand, price, stock, specs, featured) VALUES
-(5, 'Gigabyte B660M DS3H DDR4',      'Gigabyte', 380.00, 12, '{"socket":"LGA1700","chipset":"B660","form":"Micro-ATX","ram_type":"DDR4","max_ram_gb":128,"pcie_slots":1,"m2_slots":2}', FALSE),
+INSERT INTO products (category_id, name, brand, price, stock, specs, image_url, featured) VALUES
+(5, 'Gigabyte B660M DS3H DDR4',      'Gigabyte', 380.00, 12, '{"socket":"LGA1700","chipset":"B660","form":"Micro-ATX","ram_type":"DDR4","max_ram_gb":128,"pcie_slots":1,"m2_slots":2}', 'https://www.bhphotovideo.com/cdn-cgi/image/fit=scale-down,width=500,quality=95/https://www.bhphotovideo.com/images/images500x500/gigabyte_b660m_ds3h_ddr4_motherboard_1643239214_1681732.jpg', FALSE),
 (5, 'MSI PRO B760M-A DDR5',          'MSI',      520.00, 10, '{"socket":"LGA1700","chipset":"B760","form":"Micro-ATX","ram_type":"DDR5","max_ram_gb":192,"pcie_slots":1,"m2_slots":3}', TRUE),
 (5, 'ASUS ROG Strix Z790-E DDR5',    'ASUS',     850.00, 6,  '{"socket":"LGA1700","chipset":"Z790","form":"ATX","ram_type":"DDR5","max_ram_gb":192,"pcie_slots":2,"m2_slots":5}', FALSE),
 (5, 'MSI B550 Tomahawk',             'MSI',      340.00, 15, '{"socket":"AM4","chipset":"B550","form":"ATX","ram_type":"DDR4","max_ram_gb":128,"pcie_slots":2,"m2_slots":2}', TRUE),
@@ -150,7 +150,7 @@ INSERT INTO products (category_id, name, brand, price, stock, specs, featured) V
 (5, 'ASUS ROG Crosshair X670E Hero', 'ASUS',     780.00, 5,  '{"socket":"AM5","chipset":"X670E","form":"ATX","ram_type":"DDR5","max_ram_gb":192,"pcie_slots":3,"m2_slots":4}', TRUE);
 
 -- PSU
-INSERT INTO products (category_id, name, brand, price, stock, specs, featured) VALUES
+INSERT INTO products (category_id, name, brand, price, stock, specs, image_url, featured) VALUES
 (6, 'Corsair CV550 550W 80+ Bronze', 'Corsair', 220.00, 20, '{"watts":550,"cert":"80+ Bronze","modular":false}', FALSE),
 (6, 'EVGA 650W 80+ Bronze',         'EVGA',    280.00, 18, '{"watts":650,"cert":"80+ Bronze","modular":false}', FALSE),
 (6, 'Seasonic Focus GX 750W Gold',  'Seasonic', 380.00, 15, '{"watts":750,"cert":"80+ Gold","modular":true}', TRUE),
@@ -170,7 +170,7 @@ INSERT INTO products (category_id, name, brand, price, stock, specs, featured) V
 (6, 'Corsair AX1600i 1600W 80+ Titanium','Corsair',480.00,5,  '{"watts":1600,"cert":"80+ Titanium","modular":true}', FALSE);
 
 -- Cases
-INSERT INTO products (category_id, name, brand, price, stock, specs, featured) VALUES
+INSERT INTO products (category_id, name, brand, price, stock, specs, image_url, featured) VALUES
 (7, 'Thermaltake S100 TG Micro-ATX', 'Thermaltake', 150.00, 15, '{"form":"Micro-ATX","fans_included":1,"glass_panel":true,"max_gpu_mm":320}', FALSE),
 (7, 'NZXT H5 Flow Mid Tower',        'NZXT',        280.00, 12, '{"form":"ATX","fans_included":2,"glass_panel":true,"max_gpu_mm":365}', TRUE),
 (7, 'Corsair 4000D Airflow',         'Corsair',     320.00, 10, '{"form":"ATX","fans_included":2,"glass_panel":true,"max_gpu_mm":360}', TRUE),
@@ -190,7 +190,7 @@ INSERT INTO products (category_id, name, brand, price, stock, specs, featured) V
 (7, 'Lian Li PC-O11D EVO RGB',       'Lian Li',     480.00, 6,  '{"form":"ATX","fans_included":0,"glass_panel":true,"max_gpu_mm":420}', TRUE);
 
 -- Cooling
-INSERT INTO products (category_id, name, brand, price, stock, specs, featured) VALUES
+INSERT INTO products (category_id, name, brand, price, stock, specs, image_url, featured) VALUES
 (8, 'Hyper 212 Black Edition (Aire)', 'Cooler Master', 80.00,  25, '{"type":"air","tdp_w":150,"fan_mm":120,"height_mm":158}', FALSE),
 (8, 'DeepCool AK400 (Aire)',          'DeepCool',      180.00, 18, '{"type":"air","tdp_w":220,"fan_mm":120,"height_mm":155}', TRUE),
 (8, 'Noctua NH-D15 (Aire Premium)',   'Noctua',        350.00, 8,  '{"type":"air","tdp_w":250,"fan_mm":150,"height_mm":165}', FALSE),
@@ -210,7 +210,7 @@ INSERT INTO products (category_id, name, brand, price, stock, specs, featured) V
 (8, 'Cooler Master MasterFan MF120R ARGB','Cooler Master',22.00, 40, '{"type":"fan","size_mm":120,"rgb":true,"rpm_max":1500,"cfm":65.3}', FALSE);
 
 -- Laptops
-INSERT INTO products (category_id, name, brand, price, stock, specs, featured) VALUES
+INSERT INTO products (category_id, name, brand, price, stock, specs, image_url, featured) VALUES
 (9, 'Lenovo IdeaPad 3 15',           'Lenovo', 1800.00, 10, '{"cpu":"Ryzen 5 5500U","gpu":"Radeon Vega","ram_gb":8,"storage_gb":512,"display_in":15.6,"res":"1920x1080","battery_wh":45,"weight_kg":1.7,"use":"oficina"}', TRUE),
 (9, 'ASUS VivoBook 15 X1502',        'ASUS',   1950.00, 12, '{"cpu":"Intel i5-1235U","gpu":"Intel Iris Xe","ram_gb":8,"storage_gb":512,"display_in":15.6,"res":"1920x1080","battery_wh":50,"weight_kg":1.7,"use":"oficina"}', FALSE),
 (9, 'HP Pavilion Gaming 15',         'HP',     2800.00, 8,  '{"cpu":"Intel i5-12500H","gpu":"RTX 3050 4GB","ram_gb":8,"storage_gb":512,"display_in":15.6,"res":"1920x1080","hz":144,"battery_wh":52,"weight_kg":2.2,"use":"gaming"}', TRUE),
