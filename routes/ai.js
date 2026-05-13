@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const OpenAI = require('openai').default;
 const db = require('../db');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const client = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: 'https://api.groq.com/openai/v1'
+});
 
 // GET /api/categories
 router.get('/categories', async (req, res) => {
@@ -28,8 +30,8 @@ router.post('/build', async (req, res) => {
   try {
     // Fetch all products grouped by category
     const [products] = await db.query(`
-      SELECT p.id, p.name, p.brand, p.price, p.stock, p.specs,
-             c.slug AS category, c.name AS category_name
+      SELECT p.id, p.name, p.brand, p.price,
+            c.slug AS category
       FROM products p
       JOIN categories c ON p.category_id = c.id
       WHERE p.stock > 0
@@ -40,13 +42,7 @@ router.post('/build', async (req, res) => {
     const catalog = {};
     for (const p of products) {
       if (!catalog[p.category]) catalog[p.category] = [];
-      catalog[p.category].push({
-        id: p.id,
-        name: p.name,
-        brand: p.brand,
-        price: parseFloat(p.price),
-        specs: p.specs
-      });
+      catalog[p.category].push([p.id, p.name, parseFloat(p.price)]);
     }
 
     const scope = wantsLaptop
@@ -60,8 +56,8 @@ SOLICITUD DEL CLIENTE:
 - Presupuesto máximo: S/. ${budget} (soles peruanos)
 - Tipo de equipo: ${scope}
 
-CATÁLOGO DISPONIBLE EN TIENDA (solo estos productos, con precios en soles):
-${JSON.stringify(catalog, null, 2)}
+CATÁLOGO (arrays: [id, nombre, precio_soles], solo stock disponible):
+${JSON.stringify(catalog)}
 
 INSTRUCCIONES:
 1. Crea UNA build principal recomendada (mejor rendimiento dentro del presupuesto para la necesidad).
@@ -95,8 +91,19 @@ Responde ÚNICAMENTE con JSON válido, sin texto adicional, sin markdown, sin ba
   ]
 }`;
 
-    const result = await model.generateContent(prompt);
-    const rawText = result.response.text().trim();
+    const message = await client.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      max_tokens: 1500,
+      messages: [{ role: 'user', content: prompt }]
+    });
+
+    console.log('\n===== USO DE TOKENS =====');
+    console.log('Prompt tokens:', message.usage?.prompt_tokens);
+    console.log('Tokens de respuesta:', message.usage?.completion_tokens);
+    console.log('Total tokens usados:', message.usage?.total_tokens);
+    console.log('=========================\n');
+
+    const rawText = message.choices[0].message.content.trim();
 
     let buildResult;
     try {
@@ -132,7 +139,7 @@ Responde ÚNICAMENTE con JSON válido, sin texto adicional, sin markdown, sin ba
     res.json(buildResult);
   } catch (err) {
     console.error('AI build error:', err);
-    res.status(500).json({ error: 'Error al generar la build. Verifica tu GEMINI_API_KEY.' });
+    res.status(500).json({ error: 'Error al generar la build. Verifica tu GROQ_API_KEY.' });
   }
 });
 
