@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXBUILD — Componentes &amp; Builds</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- ── Header ────────────────────────────────── -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#" class="logo" data-nav="home">NEX<span>BUILD</span></a>
+      <nav class="main-nav">
+        <a href="#" data-nav="home" class="nav-link">Inicio</a>
+        <a href="#" data-nav="catalog" class="nav-link">Catálogo</a>
+        <a href="#" data-nav="builder" class="nav-link nav-cta">Armar con IA</a>
+      </nav>
+      <button class="menu-toggle" id="menuToggle">☰</button>
+    </div>
+  </header>
+
+  <!-- ── Pages ─────────────────────────────────── -->
+  <main id="app">
+
+    <!-- HOME ─────────────────────────────────── -->
+    <section id="page-home" class="page active">
+      <div class="hero">
+        <div class="hero-label">COMPONENTES · BUILDS · LAPTOPS</div>
+        <h1 class="hero-title">Arma tu PC<br/><span>con inteligencia.</span></h1>
+        <p class="hero-sub">Describe qué necesitas y tu presupuesto. Nuestra IA elige los mejores componentes disponibles en tienda.</p>
+        <button class="btn-primary" data-nav="builder">Empezar build →</button>
+      </div>
+
+      <!-- Featured products -->
+      <div class="section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-label">DESTACADOS</span>
+            <h2 class="section-title">Productos populares</h2>
+          </div>
+          <div class="product-grid" id="featuredGrid">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+          <div class="center-btn">
+            <button class="btn-outline" data-nav="catalog">Ver catálogo completo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div class="section bg-surface">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-label">CATEGORÍAS</span>
+            <h2 class="section-title">Explora por tipo</h2>
+          </div>
+          <div class="cat-grid" id="catGrid">
+            <!-- filled by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATALOG ──────────────────────────────── -->
+    <section id="page-catalog" class="page">
+      <div class="container">
+        <div class="catalog-top">
+          <div>
+            <span class="section-label">CATÁLOGO</span>
+            <h2 class="section-title">Todos los productos</h2>
+          </div>
+          <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar producto..." />
+            <span class="search-icon">⌕</span>
+          </div>
+        </div>
+
+        <div class="catalog-layout">
+          <aside class="sidebar">
+            <div class="sidebar-title">CATEGORÍA</div>
+            <ul class="cat-list" id="catFilter">
+              <li class="cat-item active" data-cat="">Todos</li>
+            </ul>
+          </aside>
+
+          <div class="catalog-main">
+            <div class="catalog-meta" id="catalogMeta">Cargando...</div>
+            <div class="product-grid" id="catalogGrid">
+              <div class="skeleton-card"></div>
+              <div class="skeleton-card"></div>
+              <div class="skeleton-card"></div>
+              <div class="skeleton-card"></div>
+            </div>
+            <div class="pagination" id="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUILDER ──────────────────────────────── -->
+    <section id="page-builder" class="page">
+      <div class="container">
+        <div class="builder-header">
+          <span class="section-label">INTELIGENCIA ARTIFICIAL</span>
+          <h2 class="section-title">Arma tu build perfecta</h2>
+          <p class="builder-sub">Dinos para qué usarás el equipo y tu presupuesto. La IA seleccionará los mejores componentes disponibles en tienda con alternativas ordenadas por conveniencia.</p>
+        </div>
+
+        <div class="builder-form-wrap">
+          <div class="builder-form" id="builderForm">
+            <div class="form-group">
+              <label class="form-label">¿Para qué usarás el equipo?</label>
+              <textarea id="useCaseInput" class="form-textarea" rows="4"
+                placeholder="Ej: Gaming a 1080p con juegos como CS2, Valorant y GTA V. Quiero +144fps. También edición de video ocasional."></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Presupuesto máximo (S/.)</label>
+                <input type="number" id="budgetInput" class="form-input" min="500" max="50000"
+                  placeholder="Ej: 3500" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tipo de equipo</label>
+                <div class="toggle-group">
+                  <button class="toggle-btn active" id="desktopBtn">🖥️ PC de escritorio</button>
+                  <button class="toggle-btn" id="laptopBtn">💻 Laptop</button>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-primary btn-full" id="generateBtn">
+              <span id="generateBtnText">Generar build con IA</span>
+            </button>
+
+            <div class="quick-examples">
+              <span class="examples-label">EJEMPLOS RÁPIDOS:</span>
+              <button class="example-pill" data-use="Gaming 1080p con juegos como Valorant, CS2 y Apex. Quiero frames altos y estables." data-budget="2500">Gaming básico</button>
+              <button class="example-pill" data-use="Edición de video 4K en Premiere Pro y After Effects. Trabajo profesional con plazos ajustados." data-budget="5000">Video 4K</button>
+              <button class="example-pill" data-use="Oficina y estudio universitario: navegador, Word, Excel, videollamadas y programación en VS Code." data-budget="1800">Oficina / Estudio</button>
+              <button class="example-pill" data-use="Programación y desarrollo de software: múltiples contenedores Docker, IDEs pesados, máquinas virtuales." data-budget="4000">Desarrollo de Software</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="builderResults" class="builder-results hidden">
+          <div class="results-tabs">
+            <button class="result-tab active" data-tab="recommended">⭐ Recomendada</button>
+            <button class="result-tab" data-tab="alt1">Alternativa 1</button>
+            <button class="result-tab" data-tab="alt2">Alternativa 2</button>
+          </div>
+          <div id="resultsContent"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Product modal -->
+  <div class="modal-overlay hidden" id="modalOverlay">
+    <div class="modal" id="productModal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span class="logo">NEX<span>BUILD</span></span>
+      <span class="footer-note">© 2025 NEXBUILD — Powered by IA</span>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
