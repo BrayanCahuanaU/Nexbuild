@@ -1,11 +1,9 @@
--- ============================================================
--- PC Store Schema + Seed Data (PostgreSQL)
--- ============================================================
 
 -- Crear DB manualmente:
--- CREATE DATABASE pcstore;
-
+CREATE DATABASE IF NOT EXISTS pcstore;
 -- Conectarse a pcstore antes de ejecutar este archivo
+
+USE pcstore;
 
 DROP TABLE IF EXISTS builds CASCADE;
 DROP TABLE IF EXISTS products CASCADE;

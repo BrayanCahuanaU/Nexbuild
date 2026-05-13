@@ -13,7 +13,7 @@ const state = {
   wantsLaptop:  false,
   buildResult:  null,
   activeTab:    'recommended',
-  cart: [] // Estructura: [{ id, name, price, quantity }]
+  cart: JSON.parse(localStorage.getItem('cart')) || []
 };
 
 // ── DOM helpers ───────────────────────────────────────────
@@ -421,63 +421,254 @@ document.addEventListener('DOMContentLoaded', () => {
   initBuilder();
   // Checkout button
   $('#checkoutBtn')?.addEventListener('click', checkout);
+  renderCart();
   navigateTo('home');
 });
 
 
 // Función para añadir al carrito
 function addToCart(product, quantity = 1) {
-  const existing = state.cart.find(item => item.id === product.id);
-  if (existing) {
-    existing.quantity += quantity;
-  } else {
-    state.cart.push({ ...product, quantity });
-  }
-  alert(`${product.name} añadido al carrito`);
 
-  // Actualizar la vista del carrito si está activa
-  const cartPage = document.querySelector('#page-cart');
-  if (cartPage && cartPage.classList.contains('active')) {
-    renderCart();
+  const existing = state.cart.find(
+    item => item.id === product.id
+  );
+
+  if (existing) {
+
+    if (existing.quantity + quantity > product.stock) {
+      alert('No hay suficiente stock disponible');
+      return;
+    }
+
+    existing.quantity += quantity;
+
+  } else {
+
+    state.cart.push({
+      ...product,
+      quantity
+    });
+
   }
+
+  saveCart();
+
+  renderCart();
+
+  alert(`${product.name} añadido al carrito`);
 }
 
 // Función para finalizar compra
 async function checkout() {
+
+  if (!state.cart.length) {
+    alert('El carrito está vacío');
+    return;
+  }
+
   try {
+
     const res = await apiFetch('/api/cart/checkout', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: state.cart.map(i => ({ id: i.id, quantity: i.quantity })) })
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        items: state.cart.map(i => ({
+          id: i.id,
+          quantity: i.quantity
+        }))
+      })
     });
-    
+
     if (res.success) {
+
       state.cart = [];
-      alert('¡Compra realizada!');
+
+      saveCart();
+
+      renderCart();
+
+      alert('¡Compra realizada con éxito!');
+
       navigateTo('home');
     }
+
   } catch (err) {
+
     alert(err.message);
+
   }
 }
 
 function renderCart() {
+
   const list = $('#cartItemsList');
   const totalEl = $('#cartTotal');
-  
+
+  if (!list || !totalEl) return;
+
   if (state.cart.length === 0) {
-    list.innerHTML = '<p>El carrito está vacío.</p>';
-    totalEl.textContent = '';
+
+    list.innerHTML = `
+      <div style="
+        padding:40px;
+        text-align:center;
+        color:var(--text-muted);
+      ">
+        Tu carrito está vacío
+      </div>
+    `;
+
+    totalEl.textContent = fmt(0);
     return;
   }
 
-  list.innerHTML = state.cart.map(item => `
-    <div class="cart-item">
-      <span>${item.name}</span>
-      <span>${item.quantity} x ${fmt(item.price)}</span>
-    </div>
-  `).join('');
+  let total = 0;
 
-  const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  totalEl.textContent = `Total: ${fmt(total)}`;
+  list.innerHTML = state.cart.map(item => {
+
+    const subtotal = item.price * item.quantity;
+    total += subtotal;
+
+    return `
+      <div class="cart-item">
+
+        <div class="cart-item-image">
+          <img
+            src="${item.image_url || 'https://via.placeholder.com/300x200?texto=Sin+Imagen'}"
+            alt="${item.name}"
+          >
+        </div>
+
+        <div class="cart-item-info">
+
+          <div class="cart-item-category">
+            ${item.category_name || ''}
+          </div>
+
+          <div class="cart-item-name">
+            ${item.name}
+          </div>
+
+          <div class="cart-item-price">
+            ${fmt(item.price)}
+          </div>
+
+        </div>
+
+        <div class="cart-controls">
+
+          <div class="qty-controls">
+
+            <button
+              class="qty-btn"
+              onclick="decreaseQty(${item.id})"
+            >
+              −
+            </button>
+
+            <input
+              class="qty-input"
+              type="number"
+              min="1"
+              max="${item.stock}"
+              value="${item.quantity}"
+              onchange="updateQty(${item.id}, this.value)"
+            >
+
+            <button
+              class="qty-btn"
+              onclick="increaseQty(${item.id})"
+            >
+              +
+            </button>
+
+          </div>
+
+          <button
+            class="remove-btn"
+            onclick="removeFromCart(${item.id})"
+          >
+            Eliminar
+          </button>
+
+        </div>
+
+      </div>
+    `;
+  }).join('');
+
+  totalEl.textContent = `TOTAL: ${fmt(total)}`;
+}
+
+function increaseQty(id) {
+
+  const item = state.cart.find(p => p.id === id);
+
+  if (!item) return;
+
+  if (item.quantity < item.stock) {
+    item.quantity++;
+  }
+
+  saveCart();
+
+  renderCart();
+}
+
+function decreaseQty(id) {
+
+  const item = state.cart.find(p => p.id === id);
+
+  if (!item) return;
+
+  if (item.quantity > 1) {
+    item.quantity--;
+  }
+
+  saveCart();
+
+  renderCart();
+}
+
+function updateQty(id, qty) {
+
+  const item = state.cart.find(p => p.id === id);
+
+  if (!item) return;
+
+  qty = parseInt(qty);
+
+  if (isNaN(qty) || qty < 1) {
+    qty = 1;
+  }
+
+  if (qty > item.stock) {
+    qty = item.stock;
+  }
+
+  item.quantity = qty;
+
+  saveCart();
+
+  renderCart();
+}
+
+function removeFromCart(id) {
+
+  state.cart = state.cart.filter(
+    item => item.id !== id
+  );
+
+  saveCart();
+
+  renderCart();
+}
+
+function saveCart() {
+  localStorage.setItem(
+    'cart',
+    JSON.stringify(state.cart)
+  );
 }

@@ -20,14 +20,7 @@
         <a href="#" data-nav="builder" class="nav-link nav-cta">Armar con IA</a>
         <a href="#" data-nav="cart" class="nav-link" id="cartLink">🛒 Carrito</a>
       </nav>
-      <section id="page-cart" class="page">
-        <div class="container">
-          <h2 class="section-title">Tu Carrito</h2>
-          <div id="cartItemsList"></div>
-          <div id="cartTotal" style="font-size: 1.5rem; margin: 20px 0;"></div>
-          <button id="checkoutBtn" class="btn-primary">Finalizar Compra</button>
-        </div>
-      </section>
+      
       <button class="menu-toggle" id="menuToggle">☰</button>
     </div>
   </header>
@@ -180,6 +173,26 @@
       <div id="modalContent"></div>
     </div>
   </div>
+
+  <!-- CART -->
+  <section id="page-cart" class="page">
+    <div class="container">
+      <div class="cart-header">
+        <span class="section-label">CARRITO</span>
+        <h2 class="section-title">Tus productos</h2>
+      </div>
+
+      <div id="cartItemsList" class="cart-list"></div>
+
+      <div class="cart-summary">
+        <div id="cartTotal" class="cart-total"></div>
+
+        <button id="checkoutBtn" class="btn-primary">
+          Finalizar Compra
+        </button>
+      </div>
+    </div>
+  </section>
 
   <footer class="site-footer">
     <div class="container footer-inner">
