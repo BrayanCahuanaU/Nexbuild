@@ -13,6 +13,7 @@ const state = {
   wantsLaptop:  false,
   buildResult:  null,
   activeTab:    'recommended',
+  cart: [] // Estructura: [{ id, name, price, quantity }]
 };
 
 // ── DOM helpers ───────────────────────────────────────────
@@ -31,6 +32,7 @@ function navigateTo(page) {
 
   if (page === 'catalog') loadCatalog();
   if (page === 'home') loadHome();
+  if (page === 'cart') renderCart();
 }
 
 // ── API calls ─────────────────────────────────────────────
@@ -125,9 +127,19 @@ async function openProductModal(id) {
       <div class="modal-price">${fmt(p.price)}</div>
       ${specsHtml ? `<div class="specs-grid">${specsHtml}</div>` : ''}
       <div class="modal-stock">✓ ${p.stock} unidades en stock</div>
+
+      <button id="addToCartBtn" class="btn-primary" style="margin-top:20px; width:100%">
+      Añadir al carrito
+      </button>
     `;
 
     $('#modalOverlay').classList.remove('hidden');
+
+    $('#addToCartBtn').addEventListener('click', () => {
+    // Asumiendo que 'p' es el objeto del producto cargado
+    addToCart(p, 1); 
+    $('#modalOverlay').classList.add('hidden');
+    });
   } catch (err) {
     console.error(err);
   }
@@ -407,5 +419,65 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   initBuilder();
+  // Checkout button
+  $('#checkoutBtn')?.addEventListener('click', checkout);
   navigateTo('home');
 });
+
+
+// Función para añadir al carrito
+function addToCart(product, quantity = 1) {
+  const existing = state.cart.find(item => item.id === product.id);
+  if (existing) {
+    existing.quantity += quantity;
+  } else {
+    state.cart.push({ ...product, quantity });
+  }
+  alert(`${product.name} añadido al carrito`);
+
+  // Actualizar la vista del carrito si está activa
+  const cartPage = document.querySelector('#page-cart');
+  if (cartPage && cartPage.classList.contains('active')) {
+    renderCart();
+  }
+}
+
+// Función para finalizar compra
+async function checkout() {
+  try {
+    const res = await apiFetch('/api/cart/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: state.cart.map(i => ({ id: i.id, quantity: i.quantity })) })
+    });
+    
+    if (res.success) {
+      state.cart = [];
+      alert('¡Compra realizada!');
+      navigateTo('home');
+    }
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+function renderCart() {
+  const list = $('#cartItemsList');
+  const totalEl = $('#cartTotal');
+  
+  if (state.cart.length === 0) {
+    list.innerHTML = '<p>El carrito está vacío.</p>';
+    totalEl.textContent = '';
+    return;
+  }
+
+  list.innerHTML = state.cart.map(item => `
+    <div class="cart-item">
+      <span>${item.name}</span>
+      <span>${item.quantity} x ${fmt(item.price)}</span>
+    </div>
+  `).join('');
+
+  const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  totalEl.textContent = `Total: ${fmt(total)}`;
+}

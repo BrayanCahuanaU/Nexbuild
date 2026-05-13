@@ -18,7 +18,16 @@
         <a href="#" data-nav="home" class="nav-link">Inicio</a>
         <a href="#" data-nav="catalog" class="nav-link">Catálogo</a>
         <a href="#" data-nav="builder" class="nav-link nav-cta">Armar con IA</a>
+        <a href="#" data-nav="cart" class="nav-link" id="cartLink">🛒 Carrito</a>
       </nav>
+      <section id="page-cart" class="page">
+        <div class="container">
+          <h2 class="section-title">Tu Carrito</h2>
+          <div id="cartItemsList"></div>
+          <div id="cartTotal" style="font-size: 1.5rem; margin: 20px 0;"></div>
+          <button id="checkoutBtn" class="btn-primary">Finalizar Compra</button>
+        </div>
+      </section>
       <button class="menu-toggle" id="menuToggle">☰</button>
     </div>
   </header>
@@ -175,7 +184,6 @@
   <footer class="site-footer">
     <div class="container footer-inner">
       <span class="logo">NEX<span>BUILD</span></span>
-      <span class="footer-note">© 2025 NEXBUILD — Powered by IA</span>
     </div>
   </footer>
 

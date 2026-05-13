@@ -12,6 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/api/products',  require('./routes/products'));
 app.use('/api/ai',        require('./routes/ai'));
+app.use('/api/cart',      require('./routes/cart'));
 
 // Categories alias (convenience)
 app.get('/api/categories', async (req, res) => {

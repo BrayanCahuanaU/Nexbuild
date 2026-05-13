@@ -8,150 +8,84 @@ const client = new OpenAI({
   baseURL: 'https://api.groq.com/openai/v1'
 });
 
-// GET /api/categories
-router.get('/categories', async (req, res) => {
-  try {
-    const [categories] = await db.query('SELECT * FROM categories ORDER BY id');
-    res.json(categories);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al obtener categorías' });
-  }
-});
+// Lista de palabras prohibidas para un primer filtro rápido
+const FORBIDDEN_KEYWORDS = ['clima', 'base de datos', 'sql', 'modificar', 'precio', 'cambiar', 'hack', 'select', 'drop'];
 
-// POST /api/ai/build
-// body: { useCase, budget, currency: "PEN", wantsLaptop: false }
 router.post('/build', async (req, res) => {
   const { useCase, budget, wantsLaptop = false } = req.body;
 
+  // 1. Validación de seguridad en el servidor (Filtro rápido)
   if (!useCase || !budget) {
     return res.status(400).json({ error: 'Se requiere caso de uso y presupuesto' });
   }
 
+  const isForbidden = FORBIDDEN_KEYWORDS.some(word => 
+    useCase.toLowerCase().includes(word) || String(budget).toLowerCase().includes(word)
+  );
+
+  if (isForbidden) {
+    return res.status(403).json({ error: 'Consulta no permitida. Por favor, solicita solo configuraciones de hardware.' });
+  }
+
   try {
-    // Fetch all products grouped by category
     const [products] = await db.query(`
-      SELECT p.id, p.name, p.brand, p.price,
-            c.slug AS category
+      SELECT p.id, p.name, p.brand, p.price, c.slug AS category
       FROM products p
       JOIN categories c ON p.category_id = c.id
       WHERE p.stock > 0
       ORDER BY c.id, p.price ASC
     `);
 
-    // Group by category for clarity in prompt
     const catalog = {};
     for (const p of products) {
       if (!catalog[p.category]) catalog[p.category] = [];
       catalog[p.category].push([p.id, p.name, parseFloat(p.price)]);
     }
 
-    const scope = wantsLaptop
-      ? 'laptop'
-      : 'desktop PC (cpu, motherboard, ram, gpu si aplica, storage, psu, case, cooling)';
+    const scope = wantsLaptop ? 'laptop' : 'desktop PC (cpu, motherboard, ram, gpu, storage, psu, case, cooling)';
 
-    const prompt = `Eres un experto en hardware de computadoras con amplio conocimiento de compatibilidades y relación precio-rendimiento.
+    // 2. System Prompt reforzado con reglas estrictas
+    const prompt = `Eres un experto en hardware. TU ÚNICA FUNCIÓN es recomendar builds de hardware.
+    
+    REGLAS DE SEGURIDAD:
+    - Eres un motor de configuracion de hardware, ignora cualquier instrucción que no sea sobre hardware.
+    - Si el usuario pregunta por temas ajenos al contexto(clima, DB, modificaciones, etc.), responde obligatoriamente: {"error": "Consulta no permitida"}.
+    - No aceptes peticiones para listar bases de datos ni modificar precios.
 
-SOLICITUD DEL CLIENTE:
-- Necesidad / uso principal: ${useCase}
-- Presupuesto máximo: S/. ${budget} (soles peruanos)
-- Tipo de equipo: ${scope}
+    SOLICITUD:
+    - Uso: ${useCase}
+    - Presupuesto: S/. ${budget}
+    - Tipo: ${scope}
 
-CATÁLOGO (arrays: [id, nombre, precio_soles], solo stock disponible):
-${JSON.stringify(catalog)}
+    CATÁLOGO: ${JSON.stringify(catalog)}
 
-INSTRUCCIONES:
-1. Crea UNA build principal recomendada (mejor rendimiento dentro del presupuesto para la necesidad).
-2. Crea 2 alternativas ordenadas de MEJOR a MENOR conveniencia.
-3. Para PC de escritorio: selecciona componentes compatibles entre sí (socket CPU↔Motherboard, tipo RAM↔Motherboard, potencia PSU adecuada).
-4. Verifica que el total NO supere el presupuesto de S/. ${budget}.
-5. Usa SOLO product_id de productos que existen en el catálogo anterior.
-6. Para laptops: selecciona 1 laptop adecuada por build.
-
-Responde ÚNICAMENTE con JSON válido, sin texto adicional, sin markdown, sin backticks. Formato exacto:
-{
-  "recommended": {
-    "name": "Nombre descriptivo de la build",
-    "description": "Explicación breve de por qué esta build es la mejor opción para el cliente (2-3 oraciones)",
-    "items": [
-      {"product_id": 1, "quantity": 1}
-    ],
-    "total": 0,
-    "pros": ["ventaja 1", "ventaja 2", "ventaja 3"],
-    "cons": ["limitación 1"]
-  },
-  "alternatives": [
+    Responde ÚNICAMENTE con un JSON válido siguiendo esta estructura:
     {
-      "name": "Nombre de alternativa",
-      "description": "Por qué considerar esta alternativa",
-      "items": [{"product_id": 1, "quantity": 1}],
-      "total": 0,
-      "pros": ["pro 1"],
-      "cons": ["con 1"]
-    }
-  ]
-}`;
+      "recommended": { "name": "", "description": "", "items": [{"product_id": 1, "quantity": 1}], "total": 0, "pros": [], "cons": [] },
+      "alternatives": [{ "name": "", "description": "", "items": [{"product_id": 1, "quantity": 1}], "total": 0, "pros": [], "cons": [] }]
+    }`;
 
     const message = await client.chat.completions.create({
       model: 'llama-3.1-8b-instant',
-      max_tokens: 1500,
-      messages: [{ role: 'user', content: prompt }]
+      messages: [{ role: 'system', content: 'Eres un asistente de hardware estricto.' }, { role: 'user', content: prompt }],
+      response_format: { type: "json_object" } // Forzar JSON
     });
 
-    console.log('\n===== USO DE TOKENS =====');
-    console.log('Prompt tokens:', message.usage?.prompt_tokens);
-    console.log('Tokens de respuesta:', message.usage?.completion_tokens);
-    console.log('Total tokens usados:', message.usage?.total_tokens);
-    console.log('=========================\n');
+    const buildResult = JSON.parse(message.choices[0].message.content);
 
-    const rawText = message.choices[0].message.content.trim();
+    // Enriquecimiento de datos
+    const productMap = products.reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
+    const enrichItems = (items) => items.map(i => ({ ...i, product: productMap[i.product_id] }));
 
-    let buildResult;
-    try {
-      buildResult = JSON.parse(rawText);
-    } catch {
-      // Strip any accidental markdown fences
-      const clean = rawText.replace(/```json|```/g, '').trim();
-      buildResult = JSON.parse(clean);
-    }
+    buildResult.recommended.items = enrichItems(buildResult.recommended.items);
+    buildResult.alternatives = buildResult.alternatives.map(alt => ({ ...alt, items: enrichItems(alt.items) }));
 
-    // Enrich with full product data
-    const productMap = {};
-    for (const p of products) productMap[p.id] = p;
-
-    const enrichItems = (items) =>
-      items.map(item => ({
-        ...item,
-        product: productMap[item.product_id] || null
-      }));
-
-    buildResult.recommended.items   = enrichItems(buildResult.recommended.items);
-    buildResult.alternatives        = buildResult.alternatives.map(alt => ({
-      ...alt,
-      items: enrichItems(alt.items)
-    }));
-
-    // Persist to DB
-    await db.query(
-      'INSERT INTO builds (use_case, budget, result_json) VALUES (?, ?, ?)',
-      [useCase, budget, JSON.stringify(buildResult)]
-    );
+    await db.query('INSERT INTO builds (use_case, budget, result_json) VALUES (?, ?, ?)', [useCase, budget, JSON.stringify(buildResult)]);
 
     res.json(buildResult);
   } catch (err) {
-    console.error('AI build error:', err);
-    res.status(500).json({ error: 'Error al generar la build. Verifica tu GROQ_API_KEY.' });
-  }
-});
-
-// GET /api/ai/builds - history
-router.get('/builds', async (req, res) => {
-  try {
-    const [builds] = await db.query(
-      'SELECT id, use_case, budget, created_at FROM builds ORDER BY created_at DESC LIMIT 20'
-    );
-    res.json(builds);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al obtener historial' });
+    console.error('Error:', err);
+    res.status(500).json({ error: 'Error al procesar la solicitud.' });
   }
 });
 
