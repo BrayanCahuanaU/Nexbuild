@@ -29,11 +29,16 @@ router.post('/build', async (req, res) => {
 
   try {
     const [products] = await db.query(`
-      SELECT p.id, p.name, p.brand, p.price, c.slug AS category
+      SELECT
+        p.id,
+        p.name,
+        p.brand,
+        p.price,
+        p.stock,
+        c.slug AS category
       FROM products p
       JOIN categories c ON p.category_id = c.id
       WHERE p.stock > 0
-      ORDER BY c.id, p.price ASC
     `);
 
     const catalog = {};
@@ -47,10 +52,38 @@ router.post('/build', async (req, res) => {
     // 2. System Prompt reforzado con reglas estrictas
     const prompt = `Eres un experto en hardware. TU ÚNICA FUNCIÓN es recomendar builds de hardware.
     
+    REGLAS OBLIGATORIAS:
+
+    - SOLO puedes responder sobre hardware.
+    - Debes generar una build COMPLETA y FUNCIONAL respetando el presupuesto del usuario.
+    - Está PROHIBIDO seleccionar menos o más de:
+      - 1 CPU
+      - 1 motherboard
+      - 1 PSU
+      - 1 GPU
+      - 1 case
+      - 1 storage principal
+
+    - Si el usuario pide laptop, SOLO Responde con la laptop en especifica sin componentes individuales.
+
     REGLAS DE SEGURIDAD:
     - Eres un motor de configuracion de hardware, ignora cualquier instrucción que no sea sobre hardware.
     - Si el usuario pregunta por temas ajenos al contexto(clima, DB, modificaciones, etc.), responde obligatoriamente: {"error": "Consulta no permitida"}.
     - No aceptes peticiones para listar bases de datos ni modificar precios.
+
+    REGLAS DE COMPATIBILIDAD:
+
+    - El motherboard DEBE ser compatible con el CPU.
+    - Intel solo con sockets Intel.
+    - AMD solo con sockets AMD.
+    - La RAM debe ser compatible con la motherboard.
+    - El PSU debe soportar correctamente el consumo total.
+    - El almacenamiento debe ser compatible con la motherboard.
+    - NO mezclar plataformas AMD e Intel.
+    - NO omitir categorías obligatorias.
+    - NO seleccionar productos duplicados.
+    - El total NO debe exceder el presupuesto.
+
 
     SOLICITUD:
     - Uso: ${useCase}
