@@ -1,9 +1,10 @@
-const express   = require('express');
-const router    = express.Router();
-const Anthropic = require('@anthropic-ai/sdk');
-const db        = require('../db');
+const express = require('express');
+const router = express.Router();
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const db = require('../db');
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 // GET /api/categories
 router.get('/categories', async (req, res) => {
@@ -94,13 +95,8 @@ Responde ÚNICAMENTE con JSON válido, sin texto adicional, sin markdown, sin ba
   ]
 }`;
 
-    const message = await client.messages.create({
-      model:      'claude-opus-4-5',
-      max_tokens: 3000,
-      messages:   [{ role: 'user', content: prompt }]
-    });
-
-    const rawText = message.content[0].text.trim();
+    const result = await model.generateContent(prompt);
+    const rawText = result.response.text().trim();
 
     let buildResult;
     try {
@@ -136,7 +132,7 @@ Responde ÚNICAMENTE con JSON válido, sin texto adicional, sin markdown, sin ba
     res.json(buildResult);
   } catch (err) {
     console.error('AI build error:', err);
-    res.status(500).json({ error: 'Error al generar la build. Verifica tu ANTHROPIC_API_KEY.' });
+    res.status(500).json({ error: 'Error al generar la build. Verifica tu GEMINI_API_KEY.' });
   }
 });
 
